@@ -22,22 +22,31 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y python3-pip build-essential git python3-dev ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev
         sudo apt-get install -y libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav libgstreamer-plugins-base1.0-dev
-        sudo apt-get install -y cmake unzip zip aidl libstdc++6
+        sudo apt-get install -y cmake unzip zip aidl libstdc++6 wget
         pip3 install --user --upgrade buildozer cython virtualenv
+
+    - name: Pre-configure Android SDK Command Line Tools Layout
+      run: |
+        # Create the exact legacy directory layout Buildozer expects
+        mkdir -p /home/runner/.buildozer/android/platform/android-sdk/tools/bin
+        mkdir -p /home/runner/.buildozer/android/platform/android-sdk/licenses
+        
+        # Download stable legacy commandlinetools so sdkmanager exists natively
+        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline.zip
+        unzip -q cmdline.zip -d /tmp
+        
+        # Move the binary files into Buildozer's expected paths
+        mv /tmp/cmdline-tools/bin/* /home/runner/.buildozer/android/platform/android-sdk/tools/bin/
+        
+        # Seed the required pre-accepted license strings
+        echo -e "24a3327a0647c90490e1e5065a2428508cda2b67\n504667f4c1327c9d08d1c140b4321099d3000a6e\n85165d130ed6d7854cd16341e873a558d4e03df4\n84831b9409646a918e30573bab4c9c91346d8abd\n504667f4c1327c9d08d1c140b4321099d3000a6e\n6d312a18541e3a42fe9bc54fa999b03c486d5e44\n35dbf9750d45d4cb49202df3349402517a6a40a1" > /home/runner/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
 
     - name: Build APK with Buildozer Cloud Engine
       env:
-        # These flags tell the Android SDK tools to auto-accept licenses without prompting
         AUTO_ACCEPT_AND_RETRY: true
         ANDROID_SDK_ROOT: /home/runner/.buildozer/android/platform/android-sdk
       run: |
         export PATH=$PATH:~/.local/bin
-        
-        # 1. Pre-seed the exact license hashes so the SDK manager passes instantly
-        mkdir -p /home/runner/.buildozer/android/platform/android-sdk/licenses
-        echo -e "24a3327a0647c90490e1e5065a2428508cda2b67\n504667f4c1327c9d08d1c140b4321099d3000a6e\n85165d130ed6d7854cd16341e873a558d4e03df4\n84831b9409646a918e30573bab4c9c91346d8abd\n504667f4c1327c9d08d1c140b4321099d3000a6e\n6d312a18541e3a42fe9bc54fa999b03c486d5e44\n35dbf9750d45d4cb49202df3349402517a6a40a1" > /home/runner/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-        
-        # 2. Run the build command normally in a clean interactive context
         buildozer android debug
 
     - name: Upload Finished APK Artifact
