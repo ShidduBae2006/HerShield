@@ -25,15 +25,20 @@ jobs:
         sudo apt-get install -y cmake unzip zip aidl libstdc++6
         pip3 install --user --upgrade buildozer cython virtualenv
 
-    - name: Build APK with Pre-installed System SDK
+    - name: Global Android SDK License Acceptance Check
+      run: |
+        # Force accept all licenses across the pre-installed system paths directly
+        yes | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
+    - name: Build APK with Buildozer Cloud Engine
       env:
+        # Pass auto acceptance triggers down to Buildozer's underlying subprocess contexts
         AUTO_ACCEPT_AND_RETRY: true
       run: |
         export PATH=$PATH:~/.local/bin
         
-        # Completely clear intrusive host environment variables to prevent conflicts
+        # Clear specific conflicting host environment variables
         unset ANDROID_NDK_ROOT
-        unset ANDROID_HOME
         
         buildozer android debug
 
