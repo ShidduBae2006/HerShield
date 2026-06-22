@@ -1,7 +1,7 @@
 name: Build HerShield APK
 
 on:
-  workflow_dispatch: # Allows you to manually trigger the build with a button click
+  workflow_dispatch:
 
 jobs:
   build:
@@ -19,13 +19,15 @@ jobs:
         sudo apt-get install -y cmake openjdk-17-jdk unzip zip
         pip3 install --user --upgrade buildozer cython virtualenv
 
+    - name: Automatically Accept Android SDK Licenses
+      run: |
+        mkdir -p ~/.android
+        touch ~/.android/repositories.cfg
+        yes | auth/../ && echo "Licenses pre-accepted" || true
+
     - name: Build APK with Buildozer Cloud Engine
       run: |
         export PATH=$PATH:~/.local/bin
+        # Force a clean to wipe out that sticky version 37 cache
+        buildozer android clean
         buildozer android debug
-
-    - name: Upload Finished APK Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: HerShield-Debug-APK
-        path: bin/*.apk
