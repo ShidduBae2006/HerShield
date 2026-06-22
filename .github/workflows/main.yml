@@ -29,5 +29,4 @@ jobs:
       run: |
         export PATH=$PATH:~/.local/bin
         # Force a clean to wipe out that sticky version 37 cache
-        buildozer android clean
         buildozer android debug
