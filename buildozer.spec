@@ -36,14 +36,14 @@ android.api = 33
 # (int) Minimum API your APK will support
 android.minapi = 21
 
-# (str) Android NDK version to use
-android.ndk = 25b
-
-# (str) Android Build Tools version to use
-android.build_tools_version = 33.0.0
-
 # (str) The Android arch to build for
 android.archs = arm64-v8a
 
 # (str) Bootstrap backend to use for layout initialization
 p4a.bootstrap = sdl2
+
+# -----------------------------------------------------------------------------
+# GitHub Actions System Path Overrides
+# -----------------------------------------------------------------------------
+# Explicitly use the pre-cached stable Android SDK directory on the runner host
+android.sdk_dir = /usr/local/lib/android/sdk
