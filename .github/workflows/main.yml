@@ -1,0 +1,31 @@
+name: Build HerShield APK
+
+on:
+  workflow_dispatch: # Allows you to manually trigger the build with a button click
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Cloud Workspace
+      uses: actions/checkout@v4
+
+    - name: Set up System Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-pip build-essential git python3-dev ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev
+        sudo apt-get install -y libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav libgstreamer-plugins-base1.0-dev
+        sudo apt-get install -y cmake openjdk-17-jdk unzip zip
+        pip3 install --user --upgrade buildozer cython virtualenv
+
+    - name: Build APK with Buildozer Cloud Engine
+      run: |
+        export PATH=$PATH:~/.local/bin
+        buildozer android debug
+
+    - name: Upload Finished APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: HerShield-Debug-APK
+        path: bin/*.apk
