@@ -30,8 +30,17 @@ orientation = portrait
 # (list) Android hardware permissions granted to the app
 android.permissions = android.permission.SEND_SMS, android.permission.ACCESS_FINE_LOCATION, android.permission.ACCESS_COARSE_LOCATION, android.permission.INTERNET
 
-# (int) Target Android API (Leave blank or set to 33/34 depending on NDK)
+# (int) Target Android API
 android.api = 33
+
+# (int) Minimum API your APK will support
+android.minapi = 21
+
+# (str) Android NDK version to use
+android.ndk = 25b
+
+# (str) Android Build Tools version to use
+android.build_tools_version = 33.0.0
 
 # (str) The Android arch to build for
 android.archs = arm64-v8a
